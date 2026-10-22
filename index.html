@@ -3,261 +3,611 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NumberUpgrader</title>
+    <title>NumberUpgrader • Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #0B0E14;
-            --panel-bg: #131A26;
-            --border: #1F2735;
+            --bg-1: #05070A;
+            --bg-2: #0A0F17;
+            --bg-3: #111827;
+            --panel: rgba(17, 24, 39, 0.65);
+            --panel-solid: #111827;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 204, 0, 0.4);
             --accent: #FFCC00;
+            --accent-2: #F5A623;
+            --accent-glow: rgba(255, 204, 0, 0.35);
             --text-main: #FFFFFF;
-            --text-muted: #8A99AD;
-            --win: #2ecc71;
-            --lose: #e74c3c;
-            --gold-gradient: linear-gradient(180deg, #F1C40F 0%, #D4AC0D 100%);
+            --text-muted: #8B95A7;
+            --win: #00E676;
+            --win-glow: rgba(0, 230, 118, 0.3);
+            --lose: #FF3B5C;
+            --lose-glow: rgba(255, 59, 92, 0.3);
+            --gold-gradient: linear-gradient(135deg, #FFE082 0%, #FFCC00 50%, #F5A623 100%);
+            --glass: blur(20px) saturate(180%);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            background-color: var(--bg-color);
+            background: var(--bg-1);
             color: var(--text-main);
             height: 100vh;
             display: flex;
             flex-direction: column;
-            padding-bottom: 60px;
+            padding-bottom: 70px;
             overflow: hidden;
-            background-image: radial-gradient(circle at 50% 30%, #1A2232 0%, #0B0E14 70%);
+            position: relative;
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(255, 204, 0, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(245, 166, 35, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #0A0F17 0%, #05070A 100%);
         }
-        
+
+        /* Анимированный фон */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 204, 0, 0.03) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(245, 166, 35, 0.03) 0%, transparent 30%);
+            pointer-events: none;
+            animation: floatBg 20s ease-in-out infinite;
+            z-index: 0;
+        }
+        @keyframes floatBg {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-20px, -20px) scale(1.05); }
+        }
+
         /* ЭКРАН ЗАГРУЗКИ */
         .loading-screen {
-            position: fixed; inset: 0; background: var(--bg-color); z-index: 9999;
+            position: fixed; inset: 0; background: var(--bg-1); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.6s ease;
         }
         .loading-screen.hidden { opacity: 0; pointer-events: none; }
-        .load-logo { width: 60px; height: 60px; margin-bottom: 20px; }
+        .load-logo { width: 80px; height: 80px; margin-bottom: 25px; filter: drop-shadow(0 0 20px var(--accent-glow)); }
         .load-logo path { fill: url(#goldGrad); }
-        .load-title { font-size: 16px; font-weight: 900; letter-spacing: 4px; margin-bottom: 20px; color: #fff; }
-        .load-bar-container { width: 200px; height: 4px; background: #1F2735; border-radius: 2px; overflow: hidden; position: relative; }
-        .load-bar { width: 50%; height: 100%; background: var(--gold-gradient); border-radius: 2px; animation: loadAnim 1s infinite alternate ease-in-out; }
-        @keyframes loadAnim { 0% { margin-left: -50%; } 100% { margin-left: 100%; } }
+        .load-title { font-size: 20px; font-weight: 900; letter-spacing: 6px; margin-bottom: 30px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .load-bar-container { width: 220px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; position: relative; }
+        .load-bar { width: 40%; height: 100%; background: var(--gold-gradient); border-radius: 3px; animation: loadAnim 1.2s infinite ease-in-out; box-shadow: 0 0 15px var(--accent-glow); }
+        @keyframes loadAnim { 0% { margin-left: -40%; } 100% { margin-left: 100%; } }
 
+        /* ШАПКА */
         .header {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 15px; background: var(--panel-bg);
-            border-bottom: 1px solid var(--border); z-index: 100;
+            padding: 14px 18px;
+            background: var(--panel);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            position: relative;
         }
-        .logo-area { display: flex; align-items: center; gap: 5px; font-weight: 900; font-size: 16px; }
-        .logo-icon { color: var(--accent); font-size: 18px; }
+        .logo-area { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 15px; letter-spacing: 1px; }
+        .logo-icon { 
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 22px;
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
         .balance-box {
-            background: #0B0E14; padding: 5px 10px; border-radius: 6px;
-            border: 1px solid #2A3441; font-weight: bold; font-size: 12px;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            font-weight: 800;
+            font-size: 13px;
+            display: flex; align-items: center; gap: 6px;
         }
-        .balance-box span { color: var(--accent); }
+        .balance-box::before { content: '💎'; font-size: 14px; }
+        .balance-box span { 
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+        }
 
-        .main-content { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        /* КОНТЕНТ */
+        .main-content { 
+            flex: 1; overflow-y: auto; padding: 16px; 
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; z-index: 1;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
+        }
+        .main-content::-webkit-scrollbar { width: 4px; }
+        .main-content::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+        
         .tab-content { display: none; width: 100%; max-width: 500px; }
-        .tab-content.active { display: flex; flex-direction: column; align-items: center; }
+        .tab-content.active { display: flex; flex-direction: column; align-items: center; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Колесо */
+        /* КОЛЕСО */
         .circle-zone {
             display: flex; justify-content: center; align-items: center;
-            position: relative; margin: 15px 0; height: 220px;
+            position: relative; margin: 10px 0 20px; height: 240px;
         }
-        .wheel-wrapper { position: relative; width: 200px; height: 200px; }
+        .wheel-wrapper { position: relative; width: 220px; height: 220px; }
+        .wheel-wrapper::before {
+            content: '';
+            position: absolute; inset: -10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            opacity: 0.3;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.05); }
+        }
         .wheel {
-            width: 200px; height: 200px; border-radius: 50%;
-            background: conic-gradient(var(--accent) 0deg, var(--accent) 0deg, #0B0E14 0deg);
+            width: 220px; height: 220px; border-radius: 50%;
+            background: conic-gradient(var(--accent) 0deg, var(--accent) 0deg, #0A0F17 0deg);
             display: flex; align-items: center; justify-content: center;
             border: 2px solid var(--border); transition: all 0.3s;
+            position: relative; z-index: 2;
         }
-        .wheel.win-border { border-color: var(--win); box-shadow: 0 0 30px rgba(46, 204, 113, 0.2); }
-        .wheel.lose-border { border-color: var(--lose); box-shadow: 0 0 30px rgba(231, 76, 60, 0.2); }
+        .wheel.win-border { 
+            border-color: var(--win); 
+            box-shadow: 0 0 40px var(--win-glow), inset 0 0 20px var(--win-glow);
+        }
+        .wheel.lose-border { 
+            border-color: var(--lose); 
+            box-shadow: 0 0 40px var(--lose-glow), inset 0 0 20px var(--lose-glow);
+        }
         
         .wheel-inner {
-            width: 170px; height: 170px; border-radius: 50%;
-            background: var(--panel-bg); display: flex; flex-direction: column;
+            width: 190px; height: 190px; border-radius: 50%;
+            background: linear-gradient(145deg, #111827, #0A0F17);
+            display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
             z-index: 2; position: relative; overflow: hidden;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
         }
-        .chance-text { font-size: 26px; font-weight: 900; color: var(--text-main); display: none; }
-        .chance-label { font-size: 10px; color: var(--text-muted); margin-top: 3px; text-transform: uppercase; display: none; }
-        .choose-text { color: var(--text-muted); font-size: 13px; text-align: center; line-height: 1.4; display: block; }
+        .chance-text { 
+            font-size: 32px; font-weight: 900; 
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: none;
+            letter-spacing: -1px;
+        }
+        .chance-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 2px; display: none; }
+        .choose-text { color: var(--text-muted); font-size: 13px; text-align: center; line-height: 1.5; display: block; }
 
         .arrow-pointer {
-            position: absolute; top: -12px; left: 50%; margin-left: -8px;
-            width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent;
-            border-top: 16px solid var(--accent); filter: drop-shadow(0 0 8px var(--accent));
-            transform-origin: 50% 112px; z-index: 10;
+            position: absolute; top: -14px; left: 50%; margin-left: -10px;
+            width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent;
+            border-top: 20px solid var(--accent); 
+            filter: drop-shadow(0 0 10px var(--accent));
+            transform-origin: 50% 124px; z-index: 10;
         }
 
         /* Оверлей результата */
         .result-overlay {
             position: absolute; inset: 0; display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
-            z-index: 3; background: var(--panel-bg); border-radius: 50%;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            z-index: 3; background: linear-gradient(145deg, #111827, #0A0F17); border-radius: 50%;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
         }
         .result-overlay.show { opacity: 1; }
-        .result-title { font-size: 14px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
-        .result-name { font-size: 20px; font-weight: bold; color: var(--accent); margin-bottom: 2px; }
-        .result-price { font-size: 14px; font-weight: 900; color: var(--text-muted); }
+        .result-title { font-size: 16px; font-weight: 900; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; }
+        .result-name { font-size: 18px; font-weight: 900; color: var(--accent); margin-bottom: 4px; text-shadow: 0 0 15px var(--accent-glow); }
+        .result-price { font-size: 13px; font-weight: 700; color: var(--text-muted); }
 
-        /* Панели */
-        .panels-container { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; }
+        /* ПАНЕЛИ ВЫБОРА */
+        .panels-container { display: flex; gap: 12px; width: 100%; margin-bottom: 20px; }
         .skin-panel {
-            flex: 1; height: 120px; background: var(--panel-bg);
-            border: 1px solid var(--border); border-radius: 10px;
+            flex: 1; height: 130px; 
+            background: var(--panel);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            border: 1px solid var(--border); border-radius: 16px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; padding: 8px; text-align: center; cursor: pointer;
+            position: relative; padding: 12px; text-align: center; cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
-        .skin-panel-title { position: absolute; top: 6px; font-size: 9px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; }
-        .skin-panel .number-display { font-size: 16px; font-weight: 900; color: var(--accent); margin-top: 15px; }
-        .skin-panel-name { font-size: 10px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-top: 5px; color: var(--text-muted); }
-        .skin-panel-price { font-size: 14px; color: var(--win); font-weight: bold; margin-top: 2px; }
+        .skin-panel::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,204,0,0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .skin-panel:active { transform: scale(0.97); border-color: var(--border-hover); }
+        .skin-panel:hover { border-color: var(--border-hover); }
+        
+        .skin-panel-title { 
+            position: absolute; top: 10px; 
+            font-size: 9px; font-weight: 800; color: var(--text-muted); 
+            text-transform: uppercase; letter-spacing: 1.5px; 
+        }
+        .skin-panel .number-display { 
+            font-size: 18px; font-weight: 900; 
+            color: var(--accent); margin-top: 15px;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+        .skin-panel-name { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-top: 4px; }
+        .skin-panel-price { font-size: 14px; color: var(--win); font-weight: 900; margin-top: 4px; text-shadow: 0 0 10px var(--win-glow); }
 
-        /* Кнопки */
+        /* КНОПКИ */
         .controls { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .btn-upgrade {
-            background: var(--gold-gradient); color: #000;
-            width: 100%; padding: 14px; border-radius: 10px; border: none;
-            font-size: 14px; font-weight: 900; text-transform: uppercase; cursor: pointer;
+            background: var(--gold-gradient);
+            color: #000;
+            width: 100%; padding: 18px; 
+            border-radius: 14px; border: none;
+            font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.3);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .btn-upgrade:disabled { background: #2A3441; color: #555; cursor: not-allowed; }
+        .btn-upgrade::before {
+            content: '';
+            position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .btn-upgrade:hover::before { left: 100%; }
+        .btn-upgrade:active { transform: scale(0.98); box-shadow: 0 2px 10px var(--accent-glow); }
+        .btn-upgrade:disabled { 
+            background: #1F2937; color: #4B5563; 
+            box-shadow: none; cursor: not-allowed;
+            transform: none;
+        }
 
-        .quick-btns { display: flex; justify-content: center; gap: 6px; margin-top: 10px; width: 100%; }
+        .quick-btns { display: flex; justify-content: center; gap: 8px; margin-top: 12px; width: 100%; }
         .quick-btn {
-            background: #0B0E14; color: var(--text-muted); border: 1px solid var(--border);
-            padding: 8px; border-radius: 6px; font-weight: bold; font-size: 11px;
-            cursor: pointer; flex: 1; text-align: center; transition: all 0.2s;
+            background: var(--panel);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            color: var(--text-muted); 
+            border: 1px solid var(--border);
+            padding: 10px 8px; border-radius: 10px; 
+            font-weight: 800; font-size: 12px;
+            cursor: pointer; flex: 1; text-align: center; 
+            transition: all 0.2s ease;
         }
         .quick-btn.active {
-            background: var(--accent) !important;
+            background: var(--gold-gradient) !important;
             color: #000 !important;
             border-color: var(--accent) !important;
-            font-weight: 900;
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: translateY(-1px);
         }
+        .quick-btn:active { transform: scale(0.95); }
 
-        /* ПАНЕЛЬ ПОИСКА И ФИЛЬТРОВ */
+        /* ПОИСК */
         .search-panel {
-            background: var(--panel-bg); border: 1px solid var(--border); border-radius: 10px;
-            padding: 10px; width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;
+            background: var(--panel);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 14px; width: 100%; margin-bottom: 14px; 
+            display: flex; flex-direction: column; gap: 10px;
         }
         .search-row { display: flex; gap: 10px; }
         .search-input-wrap {
-            flex: 1; background: #0B0E14; border: 1px solid var(--border); border-radius: 8px;
-            display: flex; align-items: center; padding: 0 10px; height: 35px;
+            flex: 1; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border); border-radius: 10px;
+            display: flex; align-items: center; padding: 0 12px; height: 40px;
+            transition: border-color 0.2s;
         }
+        .search-input-wrap:focus-within { border-color: var(--accent); }
         .search-input-wrap input {
             background: none; border: none; color: var(--text-main); outline: none;
-            width: 100%; font-size: 12px; margin-left: 5px;
+            width: 100%; font-size: 13px; margin-left: 8px;
         }
+        .search-input-wrap input::placeholder { color: var(--text-muted); }
         .filter-btn {
-            background: #0B0E14; border: 1px solid var(--border); color: var(--text-main);
-            border-radius: 8px; padding: 0 10px; height: 35px; font-size: 12px;
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid var(--border); 
+            color: var(--text-main);
+            border-radius: 10px; padding: 0 14px; height: 40px; font-size: 12px;
+            font-weight: 700;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
         }
+        .filter-btn:active { transform: scale(0.95); }
         .price-inputs { display: flex; gap: 10px; }
         .price-inputs input {
-            background: #0B0E14; border: 1px solid var(--border); border-radius: 8px;
-            padding: 8px; color: var(--text-main); font-size: 12px; width: 100%; outline: none;
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid var(--border); border-radius: 10px;
+            padding: 10px; color: var(--text-main); font-size: 12px; 
+            width: 100%; outline: none;
+            transition: border-color 0.2s;
         }
+        .price-inputs input:focus { border-color: var(--accent); }
 
-        /* Магазин и Инвентарь */
+        /* СЕТКА */
         .grid {
             display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 10px; width: 100%; padding-bottom: 20px;
+            gap: 12px; width: 100%; padding-bottom: 20px;
         }
         @media (min-width: 400px) { .grid { grid-template-columns: repeat(3, 1fr); } }
 
         .item-card {
-            background: var(--panel-bg); border: 1px solid var(--border);
-            border-radius: 10px; padding: 10px; text-align: center; cursor: pointer;
-            position: relative; overflow: hidden; display: flex; flex-direction: column;
-            transition: transform 0.1s;
+            background: var(--panel);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 14px; padding: 12px; 
+            text-align: center; cursor: pointer;
+            position: relative; overflow: hidden; 
+            display: flex; flex-direction: column;
+            transition: all 0.2s ease;
         }
-        .item-card:active { transform: scale(0.98); }
+        .item-card:active { transform: scale(0.97); }
         
-        .op-a1 { border-bottom: 3px solid #e74c3c; }
-        .op-mts { border-bottom: 3px solid #3498db; }
-        .op-life { border-bottom: 3px solid #9b59b6; }
+        /* Цвета операторов */
+        .op-a1 { border-bottom: 3px solid #FF3B5C; box-shadow: 0 4px 20px rgba(255, 59, 92, 0.15); }
+        .op-mts { border-bottom: 3px solid #3498db; box-shadow: 0 4px 20px rgba(52, 152, 219, 0.15); }
+        .op-life { border-bottom: 3px solid #9b59b6; box-shadow: 0 4px 20px rgba(155, 89, 182, 0.15); }
         
-        .item-card .op-name { font-size: 10px; font-weight: bold; margin-bottom: 2px; }
-        .item-card .number { font-size: 16px; font-weight: 900; color: var(--accent); margin: 5px 0; }
-        .item-card .price { font-size: 12px; color: var(--win); font-weight: bold; }
+        .item-card .op-name { 
+            font-size: 10px; font-weight: 800; text-transform: uppercase; 
+            letter-spacing: 1px; margin-bottom: 4px;
+            color: var(--text-muted);
+        }
+        .item-card .number { 
+            font-size: 16px; font-weight: 900; 
+            color: var(--accent); margin: 6px 0;
+            text-shadow: 0 0 10px var(--accent-glow);
+            letter-spacing: 0.5px;
+        }
+        .item-card .price { font-size: 12px; color: var(--win); font-weight: 900; }
         
-        .btn-buy { background: var(--accent); color: #000; border: none; padding: 6px; border-radius: 6px; font-weight: bold; font-size: 10px; margin-top: 5px; width: 100%; z-index: 1; }
+        .btn-buy { 
+            background: var(--gold-gradient); 
+            color: #000; border: none; 
+            padding: 8px; border-radius: 8px; 
+            font-weight: 900; font-size: 11px; 
+            margin-top: 8px; width: 100%; 
+            cursor: pointer;
+            box-shadow: 0 2px 10px var(--accent-glow);
+            transition: all 0.2s;
+        }
+        .btn-buy:active { transform: scale(0.95); }
 
+        /* Кнопка продать всё */
         .sell-all-btn {
-            background: var(--lose); color: #fff; border: none; padding: 10px;
-            border-radius: 8px; font-weight: bold; font-size: 13px; width: 100%;
-            margin-bottom: 10px; cursor: pointer; display: none;
+            background: linear-gradient(135deg, #FF3B5C 0%, #C0392B 100%);
+            color: #fff; border: none; padding: 14px;
+            border-radius: 12px; font-weight: 900; font-size: 13px; 
+            width: 100%; margin-bottom: 14px; cursor: pointer;
+            box-shadow: 0 4px 20px var(--lose-glow);
+            display: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        .sell-all-btn:active { transform: scale(0.98); }
+
+        /* ПРОФИЛЬ */
+        .profile-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; width: 100%; }
+        .profile-btn { 
+            background: var(--panel);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            color: #fff; 
+            border: 1px solid var(--border); 
+            padding: 15px; border-radius: 12px; 
+            font-weight: 800; cursor: pointer; font-size: 14px;
+            transition: all 0.2s;
+        }
+        .profile-btn:active { transform: scale(0.98); border-color: var(--border-hover); }
+
+        .avatar-circle {
+            width: 80px; height: 80px; 
+            background: linear-gradient(135deg, #1F2937, #111827);
+            border-radius: 50%; margin: 0 auto; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 40px;
+            border: 2px solid var(--border);
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.1);
         }
 
-        .profile-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: 100%; }
-        .profile-btn { background: #1C2331; color: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
-
+        /* НИЖНЕЕ МЕНЮ */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
-            background: var(--panel-bg); border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around; z-index: 100;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: var(--panel);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; 
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; gap: 2px; width: 25%; position: relative; cursor: pointer; }
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            color: var(--text-muted); font-size: 10px; font-weight: 700;
+            gap: 3px; width: 25%; position: relative; cursor: pointer;
+            transition: all 0.2s;
+        }
         .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 18px; }
+        .nav-item.active .nav-icon { 
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+            transform: scale(1.15);
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 3px;
+            background: var(--gold-gradient);
+            border-radius: 0 0 3px 3px;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .nav-icon { font-size: 20px; transition: all 0.2s; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--panel-bg); width: 95%; max-width: 400px; height: 80vh; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header { padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-title { font-size: 14px; font-weight: bold; }
-        .close-modal { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
-        .modal-body { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; }
+        /* МОДАЛКИ */
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000; justify-content: center; align-items: center; 
+            padding: 20px;
+        }
+        .modal.active { display: flex; animation: fadeIn 0.2s ease; }
+        .modal-content { 
+            background: var(--panel-solid);
+            width: 100%; max-width: 400px; height: 80vh; 
+            border-radius: 20px; border: 1px solid var(--border); 
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .modal-header { 
+            padding: 16px; border-bottom: 1px solid var(--border); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .modal-title { font-size: 15px; font-weight: 900; letter-spacing: 0.5px; }
+        .close-modal { 
+            background: none; border: none; color: var(--text-muted); 
+            font-size: 24px; cursor: pointer; 
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .close-modal:hover { background: rgba(255,255,255,0.05); }
+        .modal-body { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; }
         
         .modal-search {
-            width: 100%; padding: 10px; background: #0B0E14; border: 1px solid var(--border);
-            border-radius: 8px; color: var(--text-main); font-size: 12px; margin-bottom: 10px; outline: none;
+            width: 100%; padding: 12px; 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid var(--border);
+            border-radius: 10px; color: var(--text-main); 
+            font-size: 13px; margin-bottom: 12px; outline: none;
         }
-        .modal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+        .modal-search:focus { border-color: var(--accent); }
+        .modal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
 
-        .promo-modal-content { max-width: 300px; padding: 20px; text-align: center; }
-        .promo-input { width: 100%; padding: 12px; background: #0B0E14; border: 1px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 16px; text-align: center; margin-bottom: 10px; outline: none; }
+        .promo-modal-content { max-width: 320px; padding: 24px; text-align: center; height: auto; }
+        .promo-input { 
+            width: 100%; padding: 14px; 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            color: var(--accent); 
+            font-size: 16px; font-weight: 900;
+            text-align: center; margin-bottom: 14px; outline: none;
+            letter-spacing: 2px;
+        }
         .promo-btns { display: flex; gap: 10px; }
-        .promo-btn { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
-        .btn-cancel { background: #2A3441; color: #fff; }
-        .btn-apply { background: var(--gold-gradient); color: #000; }
+        .promo-btn { 
+            flex: 1; padding: 14px; border-radius: 10px; 
+            font-weight: 900; cursor: pointer; border: none; 
+            font-size: 13px; text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        .promo-btn:active { transform: scale(0.97); }
+        .btn-cancel { background: #1F2937; color: #fff; }
+        .btn-apply { background: var(--gold-gradient); color: #000; box-shadow: 0 4px 15px var(--accent-glow); }
 
         .pay-modal-content {
-            background: var(--panel-bg); border: 2px solid var(--win);
-            padding: 30px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            max-width: 250px; text-align: center;
+            background: var(--panel-solid); 
+            border: 2px solid var(--win);
+            padding: 40px 30px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            max-width: 260px; text-align: center;
+            border-radius: 20px;
+            box-shadow: 0 0 40px var(--win-glow);
+            height: auto;
         }
-        .pay-spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--win); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        .pay-spinner { 
+            width: 50px; height: 50px; 
+            border: 4px solid rgba(0,230,118,0.1); 
+            border-top-color: var(--win); 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin-bottom: 20px; 
+            box-shadow: 0 0 20px var(--win-glow);
+        }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .toast {
-            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            background: var(--win); color: #fff; padding: 10px 20px; border-radius: 8px;
-            font-weight: bold; z-index: 2000; display: none; font-size: 13px;
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: var(--panel-solid); 
+            color: #fff; 
+            padding: 14px 24px; 
+            border-radius: 12px;
+            font-weight: 700; 
+            z-index: 2000; 
+            display: none; 
+            font-size: 13px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
         }
+        .toast.show { display: block; transform: translateX(-50%) translateY(0); }
 
         .hidden { display: none !important; }
 
-        .buy-modal-content { max-width: 320px; height: auto; padding: 20px; border-radius: 12px; }
-        .buy-qty-btn { background: #0B0E14; color: var(--text-main); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
-        .sell-modal-content { max-width: 320px; height: auto; padding: 20px; border-radius: 12px; }
-        .sell-info-box { background: #0B0E14; border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: left; }
-        .sell-info-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
-        .sell-info-value { font-size: 22px; font-weight: 900; color: var(--accent); }
-        .sell-btns { display: flex; gap: 10px; }
-        .btn-sell-cancel { background: #1C2331; color: #fff; }
-        .btn-sell-confirm { background: var(--gold-gradient); color: #000; }
+        /* Покупка */
+        .buy-modal-content { max-width: 340px; height: auto; padding: 24px; border-radius: 20px; }
+        .buy-qty-btn { 
+            background: rgba(0,0,0,0.3); 
+            color: var(--text-main); 
+            border: 1px solid var(--border); 
+            width: 40px; height: 40px; border-radius: 10px; 
+            font-size: 20px; font-weight: 900; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .buy-qty-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
 
-        .admin-cheat-box { background: #0B0E14; border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-top: 10px; width: 100%; display: flex; flex-direction: column; gap: 5px; }
-        .cheat-slider { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px; background: #1F2735; outline: none; }
-        .cheat-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid #fff; }
+        /* Продажа */
+        .sell-modal-content { max-width: 340px; height: auto; padding: 24px; border-radius: 20px; }
+        .sell-info-box { 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid var(--border); 
+            border-radius: 14px;
+            padding: 20px; margin-bottom: 24px; text-align: left;
+        }
+        .sell-info-label { 
+            font-size: 10px; color: var(--text-muted); 
+            text-transform: uppercase; font-weight: 800; 
+            letter-spacing: 1.5px; margin-bottom: 8px; 
+        }
+        .sell-info-value { 
+            font-size: 26px; font-weight: 900; 
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sell-btns { display: flex; gap: 10px; }
+        .btn-sell-cancel { background: #1F2937; color: #fff; }
+        .btn-sell-confirm { background: var(--gold-gradient); color: #000; box-shadow: 0 4px 15px var(--accent-glow); }
+
+        /* Админ панель */
+        .admin-cheat-box { 
+            background: rgba(255, 204, 0, 0.05); 
+            border: 1px solid rgba(255, 204, 0, 0.2); 
+            border-radius: 14px; 
+            padding: 16px; margin-top: 10px; width: 100%; 
+            display: flex; flex-direction: column; gap: 8px; 
+        }
+        .cheat-slider { 
+            -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px; 
+            background: #1F2735; outline: none; margin: 5px 0;
+        }
+        .cheat-slider::-webkit-slider-thumb { 
+            -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; 
+            background: var(--gold-gradient); cursor: pointer; 
+            border: 2px solid #fff; box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Мини-карточки в модалке */
+        .inv-item { 
+            transition: all 0.2s; 
+        }
+        .inv-item:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -265,9 +615,10 @@
     <div class="loading-screen" id="loadingScreen">
         <svg class="load-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#D4AF37;stop-opacity:1" />
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FFE082;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#FFCC00;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#F5A623;stop-opacity:1" />
                 </linearGradient>
             </defs>
             <path d="M12 2L22 12L19 15L12 8L5 15L2 12L12 2Z" />
@@ -280,12 +631,11 @@
     </div>
 
     <div class="header">
-        <div class="logo-area"><span class="logo-icon">≪</span> NUMBER UPGRADER</div>
-        <div class="balance-box">БАЛАНС: <span id="balanceDisplay">1000 ₽</span></div>
+        <div class="logo-area"><span class="logo-icon">≪</span> UPGRADER</div>
+        <div class="balance-box"><span id="balanceDisplay">1000 ₽</span></div>
     </div>
 
     <div class="main-content">
-        <!-- ВКЛАДКА АПГРЕЙД -->
         <div id="tab-upgrade" class="tab-content active">
             <div class="circle-zone">
                 <div class="wheel-wrapper">
@@ -293,7 +643,7 @@
                     <div class="wheel" id="wheel">
                         <div class="wheel-inner">
                             <div class="chance-text" id="chanceText">0%</div>
-                            <div class="chance-label" id="chanceLabel">средний шанс</div>
+                            <div class="chance-label" id="chanceLabel">шанс победы</div>
                             <div class="choose-text" id="chooseText">Выберите номер<br>для апгрейда</div>
                         </div>
                     </div>
@@ -309,8 +659,8 @@
                 <div class="skin-panel" onclick="openSelectModal('left')">
                     <div class="skin-panel-title">ВАШ НОМЕР</div>
                     <div id="leftEmpty">
-                        <div class="number-display" style="color: var(--text-muted);">+375</div>
-                        <div class="skin-panel-name">Выберите номер</div>
+                        <div class="number-display" style="color: var(--text-muted); text-shadow: none;">+375</div>
+                        <div class="skin-panel-name">Нажмите чтобы выбрать</div>
                     </div>
                     <div id="leftContent" style="display: none; width: 100%;">
                         <div class="number-display" id="leftNumber">+375...</div>
@@ -327,7 +677,7 @@
             </div>
 
             <div class="controls">
-                <button class="btn-upgrade" id="upgradeBtn">≪ ПРОКАЧАТЬ</button>
+                <button class="btn-upgrade" id="upgradeBtn">ПРОКАЧАТЬ</button>
                 <div class="quick-btns">
                     <button class="quick-btn" id="btn-x2" onclick="setQuickTarget('x2', this)">x2</button>
                     <button class="quick-btn" id="btn-x4" onclick="setQuickTarget('x4', this)">x4</button>
@@ -339,7 +689,6 @@
             </div>
         </div>
 
-        <!-- ВКЛАДКА МАГАЗИН -->
         <div id="tab-shop" class="tab-content">
             <div class="search-panel">
                 <div class="search-row">
@@ -358,31 +707,28 @@
             <div class="grid" id="shopGrid"></div>
         </div>
 
-        <!-- ВКЛАДКА ИНВЕНТАРЬ -->
         <div id="tab-inventory" class="tab-content">
             <button class="sell-all-btn" id="sellAllBtn" onclick="openSellAllModal()">Продать всё за 100% стоимости</button>
             <div class="grid" id="invGrid"></div>
         </div>
 
-        <!-- ВКЛАДКА ПРОФИЛЬ -->
         <div id="tab-profile" class="tab-content">
-            <div style="text-align: center; margin-bottom: 20px; width: 100%;">
-                <div style="width: 60px; height: 60px; background: #1F2735; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 30px;">👤</div>
-                <div style="font-size: 16px; font-weight: bold; margin-top: 10px;">Игрок</div>
-                <div style="color: var(--text-muted); font-size: 12px;" id="profileIdText">ID: #1337</div>
+            <div style="text-align: center; margin-bottom: 24px; width: 100%;">
+                <div class="avatar-circle">👤</div>
+                <div style="font-size: 18px; font-weight: 900; margin-top: 12px;">Игрок</div>
+                <div style="color: var(--text-muted); font-size: 12px; font-weight: 700; margin-top: 4px;" id="profileIdText">ID: #1337</div>
             </div>
             <div class="profile-actions">
-                <button class="profile-btn" id="addMoneyBtn" onclick="openAddMoneyModal()" style="display: none;">💰 Добавить деньги</button>
+                <button class="profile-btn" id="addMoneyBtn" onclick="openAddMoneyModal()" style="display: none; color: var(--win);">💰 Добавить деньги</button>
                 <button class="profile-btn" id="removeMoneyBtn" onclick="removeMoney()" style="display: none; color: var(--lose);">🗑 Удалить все деньги</button>
                 
-                <!-- Ползунок теперь виден ВСЕМ -->
                 <div class="admin-cheat-box" id="adminCheatPanel">
-                    <div style="display:flex; justify-content:space-between; font-size: 11px; color:var(--text-muted); margin-bottom: 5px;">
+                    <div style="display:flex; justify-content:space-between; font-size: 11px; color:var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
                         <span>ШАНС ПОДКРУТКИ</span>
-                        <span id="cheatValueDisplay">0%</span>
+                        <span id="cheatValueDisplay" style="color: var(--accent);">0%</span>
                     </div>
                     <input type="range" class="cheat-slider" id="cheatSlider" min="0" max="90" value="0" oninput="updateCheatCost()">
-                    <div id="cheatHint" style="font-size: 10px; color: var(--text-muted); margin-top: 5px; text-align: center;">(Доступно только админу)</div>
+                    <div id="cheatHint" style="font-size: 10px; color: var(--text-muted); margin-top: 5px; text-align: center; font-weight: 700;">(Доступно только админу)</div>
                 </div>
 
                 <button class="profile-btn" onclick="openPromoModal()">🎁 Ввести промокод</button>
@@ -391,7 +737,6 @@
         </div>
     </div>
 
-    <!-- Модалка выбора -->
     <div class="modal" id="selectModal">
         <div class="modal-content">
             <div class="modal-header"><div class="modal-title" id="modalTitle">Выберите номер</div><button class="close-modal" onclick="closeModal('selectModal')">×</button></div>
@@ -402,10 +747,9 @@
         </div>
     </div>
 
-    <!-- Модалка добавления денег -->
     <div class="modal" id="addMoneyModal">
         <div class="modal-content promo-modal-content">
-            <div class="modal-title">Пополнение (Админ)</div>
+            <div class="modal-title" style="margin-bottom: 16px;">Пополнение</div>
             <input type="number" class="promo-input" id="moneyInput" placeholder="Сумма в ₽">
             <div class="promo-btns">
                 <button class="promo-btn btn-cancel" onclick="closeModal('addMoneyModal')">Отмена</button>
@@ -414,11 +758,10 @@
         </div>
     </div>
 
-    <!-- Модалка промокода -->
     <div class="modal" id="promoModal">
         <div class="modal-content promo-modal-content">
-            <div class="modal-title">Промокод</div>
-            <input type="text" class="promo-input" id="promoInput" placeholder="Введите код">
+            <div class="modal-title" style="margin-bottom: 16px;">Промокод</div>
+            <input type="text" class="promo-input" id="promoInput" placeholder="ВВЕДИТЕ КОД">
             <div class="promo-btns">
                 <button class="promo-btn btn-cancel" onclick="closeModal('promoModal')">Отмена</button>
                 <button class="promo-btn btn-apply" onclick="executePromo()">Активировать</button>
@@ -426,33 +769,31 @@
         </div>
     </div>
 
-    <!-- Модалка оплаты -->
     <div class="modal" id="payModal" style="z-index: 3000;">
         <div class="modal-content pay-modal-content">
             <div class="pay-spinner"></div>
-            <div style="font-size: 14px; font-weight: bold; color: var(--win); margin-bottom: 5px;">Оплата прошла...</div>
-            <div style="font-size: 11px; color: var(--text-muted);">Зачисление номера</div>
+            <div style="font-size: 15px; font-weight: 900; color: var(--win); margin-bottom: 6px;">ОПЛАТА ПРОШЛА</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Зачисление номера...</div>
         </div>
     </div>
 
-    <!-- Модалка покупки -->
     <div class="modal" id="buyConfirmModal" style="z-index: 2500;">
         <div class="modal-content buy-modal-content">
-            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; margin-bottom: 5px;" id="buyItemCategory">ОПЕРАТОР</div>
-            <div style="font-size: 16px; font-weight: 900; margin-bottom: 5px;" id="buyItemName">Номер</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;" id="buyItemPriceText">Цена</div>
+            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 8px;" id="buyItemCategory">ОПЕРАТОР</div>
+            <div style="font-size: 20px; font-weight: 900; margin-bottom: 6px; color: var(--accent);" id="buyItemName">Номер</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;" id="buyItemPriceText">Цена</div>
 
-            <div style="background: #0B0E14; border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 10px; text-align: left;">ИТОГО</div>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 22px;">
+                <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px; text-align: left; font-weight: 800; letter-spacing: 1.5px;">ИТОГО</div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 20px; font-weight: 900; color: var(--accent);" id="buyTotalPrice">0 ₽</div>
+                    <div style="font-size: 24px; font-weight: 900; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="buyTotalPrice">0 ₽</div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <button class="buy-qty-btn" onclick="changeBuyQty(-1)">-</button>
-                        <div style="font-size: 16px; font-weight: bold; width: 20px; text-align: center;" id="buyQtyDisplay">1</div>
+                        <div style="font-size: 18px; font-weight: 900; width: 24px; text-align: center;" id="buyQtyDisplay">1</div>
                         <button class="buy-qty-btn" onclick="changeBuyQty(1)">+</button>
                     </div>
                 </div>
-                <div style="text-align: right; font-size: 10px; color: var(--text-muted); margin-top: 10px;" id="buyAvailableText">хватает на один</div>
+                <div style="text-align: right; font-size: 10px; color: var(--text-muted); margin-top: 12px; font-weight: 700;" id="buyAvailableText">хватает на один</div>
             </div>
 
             <div class="promo-btns">
@@ -462,11 +803,10 @@
         </div>
     </div>
 
-    <!-- Модалка продажи -->
     <div class="modal" id="sellConfirmModal" style="z-index: 2500;">
         <div class="modal-content sell-modal-content">
-            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; margin-bottom: 5px;" id="sellItemCategory">ОПЕРАТОР</div>
-            <div style="font-size: 16px; font-weight: 900; margin-bottom: 15px;" id="sellItemName">Номер</div>
+            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 8px;" id="sellItemCategory">ОПЕРАТОР</div>
+            <div style="font-size: 20px; font-weight: 900; margin-bottom: 20px; color: var(--accent);" id="sellItemName">Номер</div>
 
             <div class="sell-info-box">
                 <div class="sell-info-label">ВЫ ПОЛУЧИТЕ</div>
@@ -539,13 +879,12 @@
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.textContent = msg;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2500);
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
         }
 
         window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
 
-        // Показываем кнопки пополнения только админу, но ползунок видят все
         if (isAdmin) {
             document.getElementById('addMoneyBtn').style.display = 'block';
             document.getElementById('removeMoneyBtn').style.display = 'block';
@@ -554,10 +893,8 @@
             document.getElementById('cheatHint').style.color = 'var(--accent)';
         } else {
             document.getElementById('profileIdText').textContent = `ID: ${currentUserId}`;
-            document.getElementById('cheatHint').textContent = '(Доступно только админу)';
         }
 
-        // --- ГЕНЕРАЦИЯ НОМЕРОВ ---
         function loadNumbers() {
             let idCounter = 1;
             let rawItems = [];
@@ -576,18 +913,17 @@
                 return num;
             }
 
-            // Генерация 200 номеров
             for (let i = 0; i < 200; i++) {
                 let op = operators[Math.floor(Math.random() * operators.length)];
                 let rawNum = generateRandomNumber();
                 
-                let isBeautiful = Math.random() > 0.9; // 10% красивых
+                let isBeautiful = Math.random() > 0.9;
                 let displayNum = op.code + ' ' + rawNum.substring(0,3) + '-' + rawNum.substring(3,5) + '-' + rawNum.substring(5);
                 
                 let price = 50 + Math.floor(Math.random() * 5000);
                 if (isBeautiful) {
                     price = 10000 + Math.floor(Math.random() * 500000);
-                    displayNum = op.code + ' ' + '777-77-77'; // Условно красивый
+                    displayNum = op.code + ' ' + '777-77-77';
                 }
 
                 rawItems.push({
@@ -611,7 +947,7 @@
             
             setTimeout(() => {
                 document.getElementById('loadingScreen').classList.add('hidden');
-            }, 1000);
+            }, 1200);
         }
 
         window.switchTab = function(tab, el) {
@@ -627,7 +963,7 @@
 
         window.toggleSort = function() {
             isSortAsc = !isSortAsc;
-            document.getElementById('sortBtn').innerHTML = isSortAsc ? '↕ Цена (по возр.)' : '↕ Цена (по убыв.)';
+            document.getElementById('sortBtn').innerHTML = isSortAsc ? '↕ Цена' : '↕ Цена';
             renderShop();
         }
 
@@ -648,7 +984,7 @@
             
             grid.innerHTML = toRender.map(item => `
                 <div class="item-card ${item.opClass}">
-                    <div class="op-name" style="color: var(--text-muted);">${item.opName}</div>
+                    <div class="op-name">${item.opName}</div>
                     <div class="number">${item.number}</div>
                     <div class="price">${formatMoney(item.price)}</div>
                     <button class="btn-buy" onclick="event.stopPropagation(); buyItem('${item.id}')">Купить</button>
@@ -656,7 +992,7 @@
             `).join('');
             
             if (toRender.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888; padding: 20px;">Ничего не найдено</div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 20px; font-weight: 700;">Ничего не найдено</div>';
             }
         }
 
@@ -739,7 +1075,7 @@
 
             if (state.inventory.length === 0) {
                 sellAllBtn.style.display = 'none';
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888; padding: 20px;">Инвентарь пуст</div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 20px; font-weight: 700;">Инвентарь пуст</div>';
                 return;
             }
 
@@ -747,7 +1083,7 @@
 
             grid.innerHTML = state.inventory.map((item, index) => `
                 <div class="item-card ${item.opClass}" onclick="openSellModal(${index})">
-                    <div class="op-name" style="color: var(--text-muted);">${item.opName}</div>
+                    <div class="op-name">${item.opName}</div>
                     <div class="number">${item.number}</div>
                     <div class="price">${formatMoney(item.price)}</div>
                 </div>
@@ -818,7 +1154,7 @@
             let sourceItems = modalMode === 'left' ? state.inventory : ITEMS;
             
             if (modalMode === 'left' && sourceItems.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">Инвентарь пуст</div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-weight: 700;">Инвентарь пуст</div>';
                 return;
             }
 
@@ -826,7 +1162,7 @@
             let toRender = filtered.slice(0, 40);
             
             if (toRender.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">Ничего не найдено</div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-weight: 700;">Ничего не найдено</div>';
                 return;
             }
 
@@ -836,10 +1172,10 @@
                     : `pickRight('${item.id}')`;
                 
                 return `
-                <div class="inv-item ${item.opClass}" onclick="${clickAction}" style="background: #0B0E14; border: 1px solid #1F2735; border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; border-bottom: 3px solid currentColor;">
-                    <div style="font-size: 9px; color: var(--text-muted);">${item.opName}</div>
-                    <div class="number" style="font-size: 13px; color: var(--accent); font-weight: bold; margin: 3px 0;">${item.number}</div>
-                    <div style="font-size: 10px; color: var(--win); font-weight: bold;">${formatMoney(item.price)}</div>
+                <div class="inv-item" onclick="${clickAction}" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center; cursor: pointer;">
+                    <div style="font-size: 9px; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">${item.opName}</div>
+                    <div class="number" style="font-size: 14px; color: var(--accent); font-weight: 900; margin: 4px 0;">${item.number}</div>
+                    <div style="font-size: 11px; color: var(--win); font-weight: 800;">${formatMoney(item.price)}</div>
                 </div>
             `}).join('');
         }
@@ -906,7 +1242,7 @@
                 chanceText.style.display = 'none';
                 chanceLabel.style.display = 'none';
                 chooseText.style.display = 'block';
-                wheel.style.background = 'conic-gradient(var(--accent) 0deg, var(--accent) 0deg, #0B0E14 0deg)';
+                wheel.style.background = 'conic-gradient(var(--accent) 0deg, var(--accent) 0deg, #0A0F17 0deg)';
                 return;
             }
             
@@ -919,7 +1255,7 @@
             chanceText.textContent = (chance * 100).toFixed(1) + '%';
             
             const deg = chance * 360;
-            wheel.style.background = `conic-gradient(var(--accent) 0deg, var(--accent) ${deg}deg, #0B0E14 ${deg}deg)`;
+            wheel.style.background = `conic-gradient(var(--accent) 0deg, var(--accent) ${deg}deg, #0A0F17 ${deg}deg)`;
         }
 
         window.updateCheatCost = function() {
@@ -936,7 +1272,6 @@
             if (!selectedRight) return alert('Выберите цель!');
             if (selectedLeft.price >= selectedRight.price) return alert('Цель должна быть дороже!');
 
-            // Подкрутка применяется ТОЛЬКО если ты админ
             const cheatVal = isAdmin ? parseInt(document.getElementById('cheatSlider').value) : 0;
 
             isSpinning = true;
@@ -944,7 +1279,7 @@
             let baseChance = selectedLeft.price / selectedRight.price;
             if (baseChance > 1) baseChance = 1;
             
-            let finalChance = Math.min(1, baseChance + 0.10); // Скрытая подкрутка всем
+            let finalChance = Math.min(1, baseChance + 0.10);
             
             if (cheatVal > 0) {
                 finalChance = Math.min(1, finalChance + (cheatVal / 100));
@@ -992,12 +1327,14 @@
                     
                     document.getElementById('resultTitle').textContent = 'ПОБЕДА';
                     document.getElementById('resultTitle').style.color = 'var(--win)';
+                    document.getElementById('resultTitle').style.textShadow = '0 0 20px var(--win-glow)';
                     wheel.classList.add('win-border');
                     wheel.classList.remove('lose-border');
                     showToast('Вы выиграли!');
                 } else {
                     document.getElementById('resultTitle').textContent = 'ПРОИГРЫШ';
                     document.getElementById('resultTitle').style.color = 'var(--lose)';
+                    document.getElementById('resultTitle').style.textShadow = '0 0 20px var(--lose-glow)';
                     wheel.classList.add('lose-border');
                     wheel.classList.remove('win-border');
                     showToast('Вы проиграли!');
