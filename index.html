@@ -1,21 +1,30 @@
-window.addEventListener('message', function(event) {
-    var item = event.data;
-    
-    if (item.action === 'openPhone') {
-        document.body.style.display = 'block';
-    }
-    
-    if (item.action === 'closePhone') {
-        document.body.style.display = 'none';
-    }
-});
-
-document.addEventListener('keyup', function(e) {
-    if (e.key === 'Escape') {
-        fetch(`https://${GetParentResourceName()}/closePhone`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
-        });
-    }
-});
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="phone.css">
+</head>
+<body>
+    <div id="phone-container">
+        <div class="phone-header">
+            <span id="phone-time">12:00</span>
+            <span>Downtown OS</span>
+        </div>
+        <div class="phone-apps">
+            <div class="app" onclick="alert('Фракции скоро!')">
+                <div class="app-icon" style="background: #3b82f6;">Ф</div>
+                <span>Фракции</span>
+            </div>
+            <div class="app" onclick="alert('Семьи скоро!')">
+                <div class="app-icon" style="background: #10b981;">С</div>
+                <span>Семьи</span>
+            </div>
+            <div class="app" onclick="alert('Работы скоро!')">
+                <div class="app-icon" style="background: #f59e0b;">Р</div>
+                <span>Работы</span>
+            </div>
+        </div>
+    </div>
+    <script src="phone.js"></script>
+</body>
+</html>
