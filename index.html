@@ -2,29 +2,343 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="phone.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для Ули ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            padding: 16px;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 2px solid #ff69b4;
+            border-radius: 24px;
+            padding: 40px 32px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 105, 180, 0.25);
+            position: relative;
+            z-index: 1;
+        }
+
+        .heart-icon {
+            font-size: 56px;
+            margin-bottom: 8px;
+            display: inline-block;
+            animation: pulse 1.8s infinite;
+            filter: drop-shadow(0 0 12px #ff69b4);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        h1 {
+            color: #ff69b4;
+            font-size: 28px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .message {
+            color: #e0e0e0;
+            font-size: 17px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .message .highlight {
+            color: #ff69b4;
+            font-weight: 600;
+        }
+
+        .apology {
+            color: #b0b0b0;
+            font-size: 14px;
+            font-style: italic;
+            margin-bottom: 28px;
+            line-height: 1.5;
+            padding: 0 8px;
+        }
+
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+            margin: 0 auto 28px;
+        }
+
+        .question {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .question span {
+            color: #ff69b4;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            position: relative;
+            min-height: 60px;
+        }
+
+        button {
+            border: none;
+            border-radius: 50px;
+            padding: 14px 36px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+
+        .btn-yes {
+            background: #ff69b4;
+            color: #0a0a0a;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+        }
+
+        .btn-yes:hover {
+            background: #ff8dc6;
+            transform: scale(1.06);
+            box-shadow: 0 0 32px rgba(255, 105, 180, 0.8);
+        }
+
+        .btn-yes:active {
+            transform: scale(0.97);
+        }
+
+        .btn-no {
+            background: #2a2a2a;
+            color: #ff69b4;
+            border: 2px solid #ff69b4;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: left 0.2s ease, top 0.2s ease, transform 0.2s ease;
+            z-index: 2;
+        }
+
+        .btn-no:hover {
+            background: #3a3a3a;
+            transform: scale(1.04);
+        }
+
+        .hint {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #555;
+            min-height: 18px;
+            transition: color 0.3s;
+        }
+
+        /* частицы-сердечки на фоне */
+        .particle {
+            position: fixed;
+            color: #ff69b4;
+            opacity: 0.15;
+            font-size: 20px;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.2; }
+            90% { opacity: 0.2; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        .final-state .btn-no {
+            display: none;
+        }
+
+        .final-state .buttons {
+            justify-content: center;
+        }
+
+        .final-state .btn-yes {
+            animation: glow 1.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(255, 105, 180, 0.5); }
+            to { box-shadow: 0 0 50px rgba(255, 105, 180, 1); }
+        }
+
+        .success-message {
+            display: none;
+            color: #ff69b4;
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 16px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .final-state .success-message {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
-    <div id="phone-container">
-        <div class="phone-header">
-            <span id="phone-time">12:00</span>
-            <span>Downtown OS</span>
+
+    <div class="card" id="card">
+        <div class="heart-icon">💗</div>
+        <h1>Уля, это для тебя</h1>
+
+        <p class="message">
+            Я <span class="highlight">очень люблю тебя</span> и никогда не хотел тебя обидеть.
+        </p>
+        <p class="apology">
+            Если что-то было не так — прости меня, пожалуйста. Ты для меня очень важна.
+        </p>
+
+        <div class="divider"></div>
+
+        <p class="question">Ты меня <span>любишь?</span></p>
+
+        <div class="buttons" id="buttons">
+            <button class="btn-yes" id="btnYes">Да</button>
+            <button class="btn-no" id="btnNo">Нет</button>
         </div>
-        <div class="phone-apps">
-            <div class="app" onclick="alert('Фракции скоро!')">
-                <div class="app-icon" style="background: #3b82f6;">Ф</div>
-                <span>Фракции</span>
-            </div>
-            <div class="app" onclick="alert('Семьи скоро!')">
-                <div class="app-icon" style="background: #10b981;">С</div>
-                <span>Семьи</span>
-            </div>
-            <div class="app" onclick="alert('Работы скоро!')">
-                <div class="app-icon" style="background: #f59e0b;">Р</div>
-                <span>Работы</span>
-            </div>
-        </div>
+
+        <p class="hint" id="hint"></p>
+        <p class="success-message" id="successMsg">Я знал ❤️ Спасибо, Уля!</p>
     </div>
-    <script src="phone.js"></script>
+
+    <script>
+        (function() {
+            const btnNo = document.getElementById('btnNo');
+            const btnYes = document.getElementById('btnYes');
+            const card = document.getElementById('card');
+            const hint = document.getElementById('hint');
+            const buttonsContainer = document.getElementById('buttons');
+
+            // ---- частицы на фоне ----
+            for (let i = 0; i < 18; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.textContent = '❤';
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.animationDuration = (8 + Math.random() * 14) + 's';
+                p.style.animationDelay = (Math.random() * 10) + 's';
+                p.style.fontSize = (12 + Math.random() * 24) + 'px';
+                document.body.appendChild(p);
+            }
+
+            // ---- "ускользающая" кнопка "Нет" ----
+            let noCount = 0;
+            const hints = [
+                '',
+                'Попробуй ещё раз 🙂',
+                'Не так быстро 😏',
+                'Кнопка убегает...',
+                'Может, всё-таки «Да»?',
+                'Ну пожалуйста...',
+                'Ты уверена?',
+                'Я не сдамся 💪',
+                'Уля, подумай ещё раз ❤️',
+                'Кнопка «Нет» сломалась 😅',
+                'Ладно, она устала бегать...',
+            ];
+
+            function moveNoButton() {
+                // контейнер кнопок
+                const containerRect = buttonsContainer.getBoundingClientRect();
+                const btnRect = btnNo.getBoundingClientRect();
+
+                // доступная зона в пределах контейнера (с учётом размеров кнопки)
+                const maxLeft = Math.max(0, containerRect.width - btnRect.width);
+                const maxTop = Math.max(0, containerRect.height - btnRect.height);
+
+                // случайное смещение, но не слишком близко к "Да"
+                let newLeft, newTop;
+                let attempts = 0;
+                do {
+                    newLeft = Math.random() * maxLeft;
+                    newTop = Math.random() * maxTop;
+                    attempts++;
+                    if (attempts > 30) break; // защита от бесконечного цикла
+                } while (
+                    Math.abs(newLeft - (containerRect.width / 2 - btnRect.width / 2)) < 30 &&
+                    Math.abs(newTop - 0) < 30
+                );
+
+                btnNo.style.left = newLeft + 'px';
+                btnNo.style.top = newTop + 'px';
+
+                // подсказки
+                noCount++;
+                if (noCount < hints.length) {
+                    hint.textContent = hints[noCount];
+                } else {
+                    hint.textContent = 'Кнопка «Нет» окончательно сбежала 🏃‍♀️💨';
+                }
+                hint.style.color = '#ff69b4';
+            }
+
+            // Наведение мышью — убегает
+            btnNo.addEventListener('mouseenter', moveNoButton);
+
+            // На телефоне — касание тоже убегает
+            btnNo.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                moveNoButton();
+            }, { passive: false });
+
+            // На всякий случай: клик по "Нет" тоже не даёт выбрать
+            btnNo.addEventListener('click', function(e) {
+                e.preventDefault();
+                moveNoButton();
+            });
+
+            // ---- кнопка "Да" ----
+            btnYes.addEventListener('click', function() {
+                card.classList.add('final-state');
+                hint.textContent = '';
+                // можно добавить лёгкую вибрацию, если поддерживается
+                if (navigator.vibrate) navigator.vibrate(50);
+            });
+
+            // при ресайзе возвращаем кнопку в пределы контейнера
+            window.addEventListener('resize', function() {
+                if (card.classList.contains('final-state')) return;
+                const containerRect = buttonsContainer.getBoundingClientRect();
+                const btnRect = btnNo.getBoundingClientRect();
+                if (btnRect.left > containerRect.width || btnRect.top > containerRect.height) {
+                    btnNo.style.left = '0px';
+                    btnNo.style.top = '0px';
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
